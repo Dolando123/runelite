@@ -58,7 +58,7 @@ import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.util.StackFormatter;
+import net.runelite.client.util.QuantityFormatter;
 import net.runelite.http.api.examine.ExamineClient;
 import net.runelite.http.api.osbuddy.OSBGrandExchangeClient;
 
@@ -312,7 +312,9 @@ public class ExaminePlugin extends Plugin
 			|| WidgetInfo.CLUE_SCROLL_REWARD_ITEM_CONTAINER.getGroupId() == widgetGroup
 			|| WidgetInfo.LOOTING_BAG_CONTAINER.getGroupId() == widgetGroup
 			|| WidgetID.SEED_VAULT_INVENTORY_GROUP_ID == widgetGroup
-			|| WidgetID.SEED_BOX_GROUP_ID == widgetGroup)
+			|| WidgetID.SEED_BOX_GROUP_ID == widgetGroup
+			|| WidgetID.PLAYER_TRADE_SCREEN_GROUP_ID == widgetGroup
+			|| WidgetID.PLAYER_TRADE_INVENTORY_GROUP_ID == widgetGroup)
 		{
 			Widget[] children = widget.getDynamicChildren();
 			if (actionParam < children.length)
@@ -388,7 +390,7 @@ public class ExaminePlugin extends Plugin
 			if (quantity > 1)
 			{
 				message
-					.append(StackFormatter.formatNumber(quantity))
+					.append(QuantityFormatter.formatNumber(quantity))
 					.append(" x ");
 			}
 
@@ -410,7 +412,7 @@ public class ExaminePlugin extends Plugin
 								.append(ChatColorType.NORMAL)
 								.append(" GE  ")
 								.append(ChatColorType.HIGHLIGHT)
-								.append(StackFormatter.formatNumber(gePrice * finalQuantity));
+								.append(QuantityFormatter.formatNumber(gePrice * finalQuantity));
 
 							if (osbresult != null)
 							{
@@ -418,7 +420,7 @@ public class ExaminePlugin extends Plugin
 									.append(ChatColorType.NORMAL)
 									.append(" OSB  ")
 									.append(ChatColorType.HIGHLIGHT)
-									.append(StackFormatter.formatNumber(osbresult.getOverall_average() * finalQuantity));
+									.append(QuantityFormatter.formatNumber(osbresult.getOverall_average() * finalQuantity));
 							}
 
 							if (finalQuantity > 1)
@@ -427,7 +429,7 @@ public class ExaminePlugin extends Plugin
 									.append(ChatColorType.NORMAL)
 									.append(" (")
 									.append(ChatColorType.HIGHLIGHT)
-									.append(StackFormatter.formatNumber(gePrice))
+									.append(QuantityFormatter.formatNumber(gePrice))
 									.append(ChatColorType.NORMAL)
 									.append("ea)");
 							}
@@ -436,7 +438,7 @@ public class ExaminePlugin extends Plugin
 								.append(ChatColorType.NORMAL)
 								.append(" HA value ")
 								.append(ChatColorType.HIGHLIGHT)
-								.append(StackFormatter.formatNumber(alchPrice * finalQuantity));
+								.append(QuantityFormatter.formatNumber(alchPrice * finalQuantity));
 
 							if (finalQuantity > 1)
 							{
@@ -444,7 +446,7 @@ public class ExaminePlugin extends Plugin
 									.append(ChatColorType.NORMAL)
 									.append(" (")
 									.append(ChatColorType.HIGHLIGHT)
-									.append(StackFormatter.formatNumber(alchPrice))
+									.append(QuantityFormatter.formatNumber(alchPrice))
 									.append(ChatColorType.NORMAL)
 									.append("ea)");
 							}
@@ -463,7 +465,7 @@ public class ExaminePlugin extends Plugin
 					.append(ChatColorType.NORMAL)
 					.append(" HA value ")
 					.append(ChatColorType.HIGHLIGHT)
-					.append(StackFormatter.formatNumber(alchPrice * quantity));
+					.append(QuantityFormatter.formatNumber(alchPrice * quantity));
 
 				if (quantity > 1)
 				{
@@ -471,7 +473,7 @@ public class ExaminePlugin extends Plugin
 						.append(ChatColorType.NORMAL)
 						.append(" (")
 						.append(ChatColorType.HIGHLIGHT)
-						.append(StackFormatter.formatNumber(alchPrice))
+						.append(QuantityFormatter.formatNumber(alchPrice))
 						.append(ChatColorType.NORMAL)
 						.append("ea)");
 				}
