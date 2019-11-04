@@ -23,69 +23,61 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.runelite.asm.attributes.annotation;
+package net.runelite.asm.visitors;
 
-import java.util.List;
+import net.runelite.asm.Type;
+import net.runelite.asm.attributes.annotation.Annotation;
+import net.runelite.asm.attributes.annotation.ArrayElement;
+import net.runelite.asm.attributes.annotation.SimpleElement;
 import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.Opcodes;
 
-public abstract class Element<T>
+public class AnnotationElementVisitor extends AnnotationVisitor
 {
-	String name = "value";
+	private final Annotation annotation;
 
-	T value;
-
-	public String getName()
+	AnnotationElementVisitor(Annotation annotation)
 	{
-		return name;
+		super(Opcodes.ASM5);
+
+		this.annotation = annotation;
 	}
 
-	public void setName(String name)
+	@Override
+	public void visit(String name, Object value)
 	{
-		this.name = name;
+		SimpleElement element = new SimpleElement(name, value);
+		annotation.addElement(element);
 	}
 
-	public T getValue()
+	@Override
+	public AnnotationVisitor visitArray(String name)
 	{
-		return value;
-	}
-
-	public void setValue(T value)
-	{
-		this.value = value;
-	}
-
-	public String getString()
-	{
-		return value.toString();
-	}
-
-	public static void accept(AnnotationVisitor visitor, final String name, final Object value)
-	{
-		if (visitor == null)
+		ArrayElement element = new ArrayElement(name);
+		this.annotation.addElement(element);
+		return new AnnotationVisitor(Opcodes.ASM5)
 		{
-			return;
-		}
-
-		if (value instanceof Annotation)
-		{
-			Annotation annotation = (Annotation) value;
-			annotation.accept(visitor.visitAnnotation(name, annotation.getType().toString()));
-		}
-		else if (value instanceof List)
-		{
-			AnnotationVisitor arr = visitor.visitArray(name);
-			List<?> arrayValue = (List<?>) value;
-
-			for (Object o : arrayValue)
+			@Override
+			public void visit(String name, Object value)
 			{
-				accept(arr, null, o);
+				element.addValue(value);
 			}
 
-			arr.visitEnd();
-		}
-		else
-		{
-			visitor.visit(name, value);
-		}
+			@Override
+			public AnnotationVisitor visitAnnotation(String name, String descriptor)
+			{
+				Annotation annotation = new Annotation(name, new Type(descriptor));
+				element.addValue(annotation);
+				return new AnnotationElementVisitor(annotation);
+			}
+		};
+	}
+
+	@Override
+	public AnnotationVisitor visitAnnotation(String name, String descriptor)
+	{
+		Annotation annotation = new Annotation(name, new Type(descriptor));
+		this.annotation.addElement(annotation);
+		return new AnnotationElementVisitor(annotation);
 	}
 }

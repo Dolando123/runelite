@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, Adam <Adam@sigterm.info>
+ * Copyright (c) 2019, whs
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,70 +22,53 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package net.runelite.client.plugins.thieving;
 
-package net.runelite.asm.attributes.annotation;
+import com.google.common.collect.ImmutableMap;
+import java.time.Duration;
+import java.util.Map;
+import lombok.Getter;
+import net.runelite.api.ObjectID;
 
-import java.util.List;
-import org.objectweb.asm.AnnotationVisitor;
-
-public abstract class Element<T>
+enum Chest
 {
-	String name = "value";
+	TEN_COIN(Duration.ofMillis(6000), ObjectID.CHEST_11735),
+	FIFTY_COIN(Duration.ofMillis(46000), ObjectID.CHEST_11737),
+	NATURE_RUNE(Duration.ofMillis(10000), ObjectID.CHEST_11736),
+	STEEL_ARROWTIPS(Duration.ofMillis(77000), ObjectID.CHEST_11742),
+	AVERAGE_CHEST(Duration.ofMillis(90000), ObjectID.CHEST_22697),
+	BLOOD_RUNE(Duration.ofMillis(120000), ObjectID.CHEST_11738),
+	ARDOUGNE_CASTLE(Duration.ofMillis(400000), ObjectID.CHEST_11739), // FIXME: Please time
+	RICH_CHEST(Duration.ofMillis(300000), ObjectID.CHEST_22681), // FIXME: Please time
+	ROGUE_CASTLE(Duration.ofMillis(10000), ObjectID.CHEST_26757); // FIXME: Please time
 
-	T value;
+	private static final Map<Integer, Chest> CHESTS;
 
-	public String getName()
+	static
 	{
-		return name;
-	}
-
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-
-	public T getValue()
-	{
-		return value;
-	}
-
-	public void setValue(T value)
-	{
-		this.value = value;
-	}
-
-	public String getString()
-	{
-		return value.toString();
-	}
-
-	public static void accept(AnnotationVisitor visitor, final String name, final Object value)
-	{
-		if (visitor == null)
+		ImmutableMap.Builder<Integer, Chest> builder = new ImmutableMap.Builder<>();
+		for (Chest chest : values())
 		{
-			return;
-		}
-
-		if (value instanceof Annotation)
-		{
-			Annotation annotation = (Annotation) value;
-			annotation.accept(visitor.visitAnnotation(name, annotation.getType().toString()));
-		}
-		else if (value instanceof List)
-		{
-			AnnotationVisitor arr = visitor.visitArray(name);
-			List<?> arrayValue = (List<?>) value;
-
-			for (Object o : arrayValue)
+			for (int id : chest.ids)
 			{
-				accept(arr, null, o);
+				builder.put(id, chest);
 			}
+		}
+		CHESTS = builder.build();
+	}
 
-			arr.visitEnd();
-		}
-		else
-		{
-			visitor.visit(name, value);
-		}
+	@Getter
+	private final Duration respawnTime;
+	private final int[] ids;
+
+	Chest(Duration respawnTime, int... ids)
+	{
+		this.respawnTime = respawnTime;
+		this.ids = ids;
+	}
+
+	static Chest of(int id)
+	{
+		return CHESTS.get(id);
 	}
 }
